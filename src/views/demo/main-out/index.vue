@@ -18,7 +18,7 @@
         @search="onSearch"
       />
       <div class="mt-8">
-        <img src="../../../assets/images/demo.png" alt="" />
+        <img src="../../../assets/images/main-out/bg.png" alt="" />
       </div>
     </div>
   </page-wrapper>
