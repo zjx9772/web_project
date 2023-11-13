@@ -1,16 +1,13 @@
 import { getStorageShortName } from '/@/utils/env';
 import { createStorage as create, CreateStorageParams } from './storageCache';
-import {
-  SHOULD_ENABLE_STORAGE_ENCRYPTION,
-  DEFAULT_CACHE_TIME,
-} from '/@/settings/encryptionSetting';
+import { enableStorageEncryption, DEFAULT_CACHE_TIME } from '/@/settings/encryptionSetting';
 
 export type Options = Partial<CreateStorageParams>;
 
 const createOptions = (storage: Storage, options: Options = {}): Options => {
   return {
     // No encryption in debug mode
-    hasEncrypt: SHOULD_ENABLE_STORAGE_ENCRYPTION,
+    hasEncrypt: enableStorageEncryption,
     storage,
     prefixKey: getStorageShortName(),
     ...options,

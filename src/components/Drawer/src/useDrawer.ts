@@ -23,7 +23,7 @@ import { error } from '/@/utils/log';
 
 const dataTransferRef = reactive<any>({});
 
-const openData = reactive<{ [key: number]: boolean }>({});
+const visibleData = reactive<{ [key: number]: boolean }>({});
 
 /**
  * @description: Applicable to separate drawer and call outside
@@ -34,9 +34,9 @@ export function useDrawer(): UseDrawerReturnType {
   }
   const drawer = ref<DrawerInstance | null>(null);
   const loaded = ref<Nullable<boolean>>(false);
-  const uid = ref<number>(0);
+  const uid = ref<string>('');
 
-  function register(drawerInstance: DrawerInstance, uuid: number) {
+  function register(drawerInstance: DrawerInstance, uuid: string) {
     isProdMode() &&
       tryOnUnmounted(() => {
         drawer.value = null;
@@ -51,8 +51,8 @@ export function useDrawer(): UseDrawerReturnType {
     drawer.value = drawerInstance;
     loaded.value = true;
 
-    drawerInstance.emitOpen = (open: boolean, uid: number) => {
-      openData[uid] = open;
+    drawerInstance.emitVisible = (visible: boolean, uid: number) => {
+      visibleData[uid] = visible;
     };
   }
 
@@ -69,13 +69,13 @@ export function useDrawer(): UseDrawerReturnType {
       getInstance()?.setDrawerProps(props);
     },
 
-    getOpen: computed((): boolean => {
-      return openData[~~unref(uid)];
+    getVisible: computed((): boolean => {
+      return visibleData[~~unref(uid)];
     }),
 
-    openDrawer: <T = any>(open = true, data?: T, openOnSet = true): void => {
+    openDrawer: <T = any>(visible = true, data?: T, openOnSet = true): void => {
       getInstance()?.setDrawerProps({
-        open,
+        visible: visible,
       });
       if (!data) return;
 
@@ -90,7 +90,7 @@ export function useDrawer(): UseDrawerReturnType {
       }
     },
     closeDrawer: () => {
-      getInstance()?.setDrawerProps({ open: false });
+      getInstance()?.setDrawerProps({ visible: false });
     },
   };
 
@@ -100,7 +100,7 @@ export function useDrawer(): UseDrawerReturnType {
 export const useDrawerInner = (callbackFn?: Fn): UseDrawerInnerReturnType => {
   const drawerInstanceRef = ref<Nullable<DrawerInstance>>(null);
   const currentInstance = getCurrentInstance();
-  const uidRef = ref<number>(0);
+  const uidRef = ref<string>('');
 
   if (!getCurrentInstance()) {
     throw new Error('useDrawerInner() can only be used inside setup() or functional components!');
@@ -115,7 +115,7 @@ export const useDrawerInner = (callbackFn?: Fn): UseDrawerInnerReturnType => {
     return instance;
   };
 
-  const register = (modalInstance: DrawerInstance, uuid: number) => {
+  const register = (modalInstance: DrawerInstance, uuid: string) => {
     isProdMode() &&
       tryOnUnmounted(() => {
         drawerInstanceRef.value = null;
@@ -145,12 +145,12 @@ export const useDrawerInner = (callbackFn?: Fn): UseDrawerInnerReturnType => {
       changeOkLoading: (loading = true) => {
         getInstance()?.setDrawerProps({ confirmLoading: loading });
       },
-      getOpen: computed((): boolean => {
-        return openData[~~unref(uidRef)];
+      getVisible: computed((): boolean => {
+        return visibleData[~~unref(uidRef)];
       }),
 
       closeDrawer: () => {
-        getInstance()?.setDrawerProps({ open: false });
+        getInstance()?.setDrawerProps({ visible: false });
       },
 
       setDrawerProps: (props: Partial<DrawerProps>) => {

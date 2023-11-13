@@ -29,8 +29,6 @@ export interface Menu {
 
   icon?: string;
 
-  img?: string;
-
   path: string;
 
   // path contains param, auto assignment.

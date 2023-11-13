@@ -34,7 +34,6 @@
   import { useUserStore } from '/@/store/modules/user';
   import { useLockStore } from '/@/store/modules/lock';
   import headerImg from '/@/assets/images/header.jpg';
-
   export default defineComponent({
     name: 'LockModal',
     components: { BasicModal, BasicForm },
@@ -48,7 +47,7 @@
       const getRealName = computed(() => userStore.getUserInfo?.realName);
       const [register, { closeModal }] = useModalInner();
 
-      const [registerForm, { validate, resetFields }] = useForm({
+      const [registerForm, { validateFields, resetFields }] = useForm({
         showActionButtonGroup: false,
         schemas: [
           {
@@ -63,20 +62,17 @@
         ],
       });
 
-      const handleLock = async () => {
-        const { password = '' } = await validate<{
-          password: string;
-        }>();
-
+      async function handleLock() {
+        const values = (await validateFields()) as any;
+        const password: string | undefined = values.password;
         closeModal();
 
         lockStore.setLockInfo({
           isLock: true,
           pwd: password,
         });
-
         await resetFields();
-      };
+      }
 
       const avatar = computed(() => {
         const { avatar } = userStore.getUserInfo;

@@ -19,7 +19,7 @@
     replace({
       name: _path,
       query,
-      params: JSON.parse((params._origin_params as string) ?? '{}'),
+      params,
     });
   } else {
     replace({

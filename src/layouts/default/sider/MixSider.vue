@@ -31,13 +31,7 @@
           :key="item.path"
         >
           <SimpleMenuTag :item="item" collapseParent dot />
-          <img
-            v-if="item.img"
-            :src="item.img"
-            :class="[`${prefixCls}-module__icon`, getCollapsed ? 'w-16px h-16px' : 'w-20px h-20px']"
-          />
           <Icon
-            v-else
             :class="`${prefixCls}-module__icon`"
             :size="getCollapsed ? 16 : 20"
             :icon="item.icon || (item.meta && item.meta.icon)"
@@ -89,7 +83,7 @@
   import { computed, defineComponent, onMounted, ref, unref, watch } from 'vue';
   import type { RouteLocationNormalized } from 'vue-router';
   import { ScrollContainer } from '/@/components/Container';
-  import { SimpleMenu } from '/@/components/SimpleMenu';
+  import { SimpleMenu, SimpleMenuTag } from '/@/components/SimpleMenu';
   import Icon from '@/components/Icon/Icon.vue';
   import { AppLogo } from '/@/components/Application';
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
@@ -104,7 +98,6 @@
   import { getChildrenMenus, getCurrentParentPath, getShallowMenus } from '/@/router/menus';
   import { listenerRouteChange } from '/@/logics/mitt/routeChange';
   import LayoutTrigger from '../trigger/index.vue';
-  import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
 
   export default defineComponent({
     name: 'LayoutMixSider',
@@ -114,9 +107,7 @@
       SimpleMenu,
       Icon,
       LayoutTrigger,
-      SimpleMenuTag: createAsyncComponent(
-        () => import('/@/components/SimpleMenu/src/SimpleMenuTag.vue'),
-      ),
+      SimpleMenuTag,
     },
     directives: {
       clickOutside,

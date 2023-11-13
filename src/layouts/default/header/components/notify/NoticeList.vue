@@ -59,23 +59,13 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   import { List, Avatar, Tag, Typography } from 'ant-design-vue';
   import { isNumber } from '/@/utils/is';
-
-  // types
-  import type { StyleValue } from '/@/utils/types';
-  import type { FunctionalComponent } from 'vue';
-  import type { ParagraphProps } from 'ant-design-vue/es/typography/Paragraph';
-
   export default defineComponent({
     components: {
       [Avatar.name]: Avatar,
       [List.name]: List,
       [List.Item.name]: List.Item,
       AListItemMeta: List.Item.Meta,
-      ATypographyParagraph: Typography.Paragraph as FunctionalComponent<
-        ParagraphProps & {
-          style?: StyleValue;
-        }
-      >,
+      ATypographyParagraph: Typography.Paragraph,
       [Tag.name]: Tag,
     },
     props: {
@@ -122,15 +112,11 @@
       const isTitleClickable = computed(() => !!props.onTitleClick);
       const getPagination = computed(() => {
         const { list, pageSize } = props;
-
-        // compatible line 104
-        // if typeof pageSize is boolean, Number(true) && 5 = 5, Number(false) && 5 = 0
-        const size = isNumber(pageSize) ? pageSize : Number(pageSize) && 5;
-
-        if (size > 0 && list && list.length > size) {
+        if (pageSize > 0 && list && list.length > pageSize) {
           return {
             total: list.length,
-            pageSize: size,
+            pageSize,
+            //size: 'small',
             current: unref(current),
             onChange(page) {
               current.value = page;
@@ -162,7 +148,7 @@
       display: inline-block !important;
     }
 
-    .list-item {
+    &-item {
       padding: 6px;
       overflow: hidden;
       transition: all 0.3s;
@@ -182,21 +168,21 @@
             margin-right: 0;
           }
         }
-      }
 
-      .avatar {
-        margin-top: 4px;
-      }
+        .avatar {
+          margin-top: 4px;
+        }
 
-      .description {
-        font-size: 12px;
-        line-height: 18px;
-      }
+        .description {
+          font-size: 12px;
+          line-height: 18px;
+        }
 
-      .datetime {
-        margin-top: 4px;
-        font-size: 12px;
-        line-height: 18px;
+        .datetime {
+          margin-top: 4px;
+          font-size: 12px;
+          line-height: 18px;
+        }
       }
     }
   }

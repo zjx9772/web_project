@@ -5,7 +5,6 @@
     v-bind="$props"
     :class="getLevelClass"
   >
-    <img v-if="getImg" :src="getImg" class="w-16px h-16px align-top" />
     <Icon v-if="getIcon" :icon="getIcon" :size="16" />
     <div v-if="collapsedShowTitle && getIsCollapseParent" class="mt-1 collapse-title">
       {{ getI18nName }}
@@ -24,7 +23,6 @@
     :collapsedShowTitle="collapsedShowTitle"
   >
     <template #title>
-      <img v-if="getImg" :src="getImg" class="w-16px h-16px align-top" />
       <Icon v-if="getIcon" :icon="getIcon" :size="16" />
 
       <div v-if="collapsedShowTitle && getIsCollapseParent" class="mt-2 collapse-title">
@@ -81,8 +79,7 @@
       const { prefixCls } = useDesign('simple-menu');
 
       const getShowMenu = computed(() => !props.item?.meta?.hideMenu);
-      const getIcon = computed(() => (props.item?.img ? undefined : props.item?.icon));
-      const getImg = computed(() => props.item?.img);
+      const getIcon = computed(() => props.item?.icon);
       const getI18nName = computed(() => t(props.item?.name));
       const getShowSubTitle = computed(() => !props.collapse || !props.parent);
       const getIsCollapseParent = computed(() => !!props.collapse && !!props.parent);
@@ -109,7 +106,6 @@
         menuHasChildren,
         getShowMenu,
         getIcon,
-        getImg,
         getI18nName,
         getShowSubTitle,
         getLevelClass,

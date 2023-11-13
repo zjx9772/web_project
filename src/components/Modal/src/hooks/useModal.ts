@@ -24,7 +24,7 @@ import { error } from '/@/utils/log';
 
 const dataTransfer = reactive<any>({});
 
-const openData = reactive<{ [key: number]: boolean }>({});
+const visibleData = reactive<{ [key: number]: boolean }>({});
 
 /**
  * @description: Applicable to independent modal and call outside
@@ -32,9 +32,9 @@ const openData = reactive<{ [key: number]: boolean }>({});
 export function useModal(): UseModalReturnType {
   const modal = ref<Nullable<ModalMethods>>(null);
   const loaded = ref<Nullable<boolean>>(false);
-  const uid = ref<number>(0);
+  const uid = ref<string>('');
 
-  function register(modalMethod: ModalMethods, uuid: number) {
+  function register(modalMethod: ModalMethods, uuid: string) {
     if (!getCurrentInstance()) {
       throw new Error('useModal() can only be used inside setup() or functional components!');
     }
@@ -43,14 +43,14 @@ export function useModal(): UseModalReturnType {
       onUnmounted(() => {
         modal.value = null;
         loaded.value = false;
-        dataTransfer[String(unref(uid))] = null;
+        dataTransfer[unref(uid)] = null;
       });
     if (unref(loaded) && isProdMode() && modalMethod === unref(modal)) return;
 
     modal.value = modalMethod;
     loaded.value = true;
-    modalMethod.emitOpen = (open: boolean, uid: number) => {
-      openData[uid] = open;
+    modalMethod.emitVisible = (visible: boolean, uid: number) => {
+      visibleData[uid] = visible;
     };
   }
 
@@ -67,17 +67,17 @@ export function useModal(): UseModalReturnType {
       getInstance()?.setModalProps(props);
     },
 
-    getOpen: computed((): boolean => {
-      return openData[~~unref(uid)];
+    getVisible: computed((): boolean => {
+      return visibleData[~~unref(uid)];
     }),
 
     redoModalHeight: () => {
       getInstance()?.redoModalHeight?.();
     },
 
-    openModal: <T = any>(open = true, data?: T, openOnSet = true): void => {
+    openModal: <T = any>(visible = true, data?: T, openOnSet = true): void => {
       getInstance()?.setModalProps({
-        open,
+        visible: visible,
       });
 
       if (!data) return;
@@ -94,7 +94,7 @@ export function useModal(): UseModalReturnType {
     },
 
     closeModal: () => {
-      getInstance()?.setModalProps({ open: false });
+      getInstance()?.setModalProps({ visible: false });
     },
   };
   return [register, methods];
@@ -103,7 +103,7 @@ export function useModal(): UseModalReturnType {
 export const useModalInner = (callbackFn?: Fn): UseModalInnerReturnType => {
   const modalInstanceRef = ref<Nullable<ModalMethods>>(null);
   const currentInstance = getCurrentInstance();
-  const uidRef = ref<number>(0);
+  const uidRef = ref<string>('');
 
   const getInstance = () => {
     const instance = unref(modalInstanceRef);
@@ -113,7 +113,7 @@ export const useModalInner = (callbackFn?: Fn): UseModalInnerReturnType => {
     return instance;
   };
 
-  const register = (modalInstance: ModalMethods, uuid: number) => {
+  const register = (modalInstance: ModalMethods, uuid: string) => {
     isProdMode() &&
       tryOnUnmounted(() => {
         modalInstanceRef.value = null;
@@ -138,8 +138,8 @@ export const useModalInner = (callbackFn?: Fn): UseModalInnerReturnType => {
       changeLoading: (loading = true) => {
         getInstance()?.setModalProps({ loading });
       },
-      getOpen: computed((): boolean => {
-        return openData[~~unref(uidRef)];
+      getVisible: computed((): boolean => {
+        return visibleData[~~unref(uidRef)];
       }),
 
       changeOkLoading: (loading = true) => {
@@ -147,7 +147,7 @@ export const useModalInner = (callbackFn?: Fn): UseModalInnerReturnType => {
       },
 
       closeModal: () => {
-        getInstance()?.setModalProps({ open: false });
+        getInstance()?.setModalProps({ visible: false });
       },
 
       setModalProps: (props: Partial<ModalProps>) => {

@@ -5,13 +5,13 @@ import type {
   TransitionSetting,
   MultiTabsSetting,
 } from '/#/config';
-import type { BeforeMiniState, ApiAddress } from '/#/store';
+import type { BeforeMiniState } from '/#/store';
 
 import { defineStore } from 'pinia';
 import { store } from '/@/store';
 
 import { ThemeEnum } from '/@/enums/appEnum';
-import { APP_DARK_MODE_KEY, PROJ_CFG_KEY, API_ADDRESS } from '/@/enums/cacheEnum';
+import { APP_DARK_MODE_KEY_, PROJ_CFG_KEY } from '/@/enums/cacheEnum';
 import { Persistent } from '/@/utils/cache/persistent';
 import { darkMode } from '/@/settings/designSetting';
 import { resetRouter } from '/@/router';
@@ -40,7 +40,7 @@ export const useAppStore = defineStore({
       return state.pageLoading;
     },
     getDarkMode(state): 'light' | 'dark' | string {
-      return state.darkMode || localStorage.getItem(APP_DARK_MODE_KEY) || darkMode;
+      return state.darkMode || localStorage.getItem(APP_DARK_MODE_KEY_) || darkMode;
     },
 
     getBeforeMiniInfo(state): BeforeMiniState {
@@ -63,9 +63,6 @@ export const useAppStore = defineStore({
     getMultiTabsSetting(): MultiTabsSetting {
       return this.getProjectConfig.multiTabsSetting;
     },
-    getApiAddress() {
-      return JSON.parse(localStorage.getItem(API_ADDRESS) || '{}');
-    },
   },
   actions: {
     setPageLoading(loading: boolean): void {
@@ -74,7 +71,7 @@ export const useAppStore = defineStore({
 
     setDarkMode(mode: ThemeEnum): void {
       this.darkMode = mode;
-      localStorage.setItem(APP_DARK_MODE_KEY, mode);
+      localStorage.setItem(APP_DARK_MODE_KEY_, mode);
     },
 
     setBeforeMiniInfo(state: BeforeMiniState): void {
@@ -82,11 +79,7 @@ export const useAppStore = defineStore({
     },
 
     setProjectConfig(config: DeepPartial<ProjectConfig>): void {
-      this.projectConfig = deepMerge(this.projectConfig || {}, config) as ProjectConfig;
-      Persistent.setLocal(PROJ_CFG_KEY, this.projectConfig);
-    },
-    setMenuSetting(setting: Partial<MenuSetting>): void {
-      this.projectConfig!.menuSetting = deepMerge(this.projectConfig!.menuSetting, setting);
+      this.projectConfig = deepMerge(this.projectConfig || {}, config);
       Persistent.setLocal(PROJ_CFG_KEY, this.projectConfig);
     },
 
@@ -105,9 +98,6 @@ export const useAppStore = defineStore({
         this.setPageLoading(loading);
         clearTimeout(timeId);
       }
-    },
-    setApiAddress(config: ApiAddress): void {
-      localStorage.setItem(API_ADDRESS, JSON.stringify(config));
     },
   },
 });

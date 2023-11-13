@@ -1,10 +1,5 @@
 <template>
-  <Scrollbar
-    ref="scrollbarRef"
-    class="scroll-container"
-    :scrollHeight="scrollHeight"
-    v-bind="$attrs"
-  >
+  <Scrollbar ref="scrollbarRef" class="scroll-container" v-bind="$attrs">
     <slot></slot>
   </Scrollbar>
 </template>
@@ -18,9 +13,6 @@
   export default defineComponent({
     name: 'ScrollContainer',
     components: { Scrollbar },
-    props: {
-      scrollHeight: { type: Number },
-    },
     setup() {
       const scrollbarRef = ref<Nullable<ScrollbarType>>(null);
 

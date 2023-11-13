@@ -27,7 +27,7 @@ export class Memory<T = any, V = any> {
   // get<K extends keyof T>(key: K) {
   //   const item = this.getItem(key);
   //   const time = item?.time;
-  //   if (!isNil(time) && time < new Date().getTime()) {
+  //   if (!isNullOrUnDef(time) && time < new Date().getTime()) {
   //     this.remove(key);
   //   }
   //   return item?.value ?? undefined;

@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="relative !h-full w-full overflow-hidden"
-    :class="{ 'ant-input': props.bordered, 'css-dev-only-do-not-override-kqecok': props.bordered }"
-    ref="el"
-  ></div>
+  <div class="relative !h-full w-full overflow-hidden" ref="el"></div>
 </template>
 
 <script lang="ts" setup>
@@ -43,7 +39,6 @@
     },
     value: { type: String, default: '' },
     readonly: { type: Boolean, default: false },
-    bordered: { type: Boolean, default: false },
   });
 
   const emit = defineEmits(['change']);

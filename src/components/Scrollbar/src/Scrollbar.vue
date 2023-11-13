@@ -3,7 +3,7 @@
     <div
       ref="wrap"
       :class="[wrapClass, 'scrollbar__wrap', native ? '' : 'scrollbar__wrap--hidden-default']"
-      :style="wrapStyle"
+      :style="style"
       @scroll="handleScroll"
     >
       <component :is="tag" ref="resize" :class="['scrollbar__view', viewClass]" :style="viewStyle">
@@ -19,6 +19,7 @@
 <script lang="ts">
   import { addResizeListener, removeResizeListener } from '/@/utils/event';
   import componentSetting from '/@/settings/componentSetting';
+  import { toObject } from './util';
   import {
     defineComponent,
     ref,
@@ -26,11 +27,9 @@
     onBeforeUnmount,
     nextTick,
     provide,
+    computed,
     unref,
-    watch,
-    type PropType,
   } from 'vue';
-  import type { StyleValue } from '/@/utils/types';
   import Bar from './bar';
 
   const { scrollbar } = componentSetting;
@@ -45,7 +44,7 @@
         default: scrollbar?.native ?? false,
       },
       wrapStyle: {
-        type: [String, Array, Object] as PropType<StyleValue>,
+        type: [String, Array],
         default: '',
       },
       wrapClass: {
@@ -65,11 +64,6 @@
         type: String,
         default: 'div',
       },
-      scrollHeight: {
-        // 用于监控内部scrollHeight的变化
-        type: Number,
-        default: 0,
-      },
     },
     setup(props) {
       const sizeWidth = ref('0');
@@ -80,6 +74,13 @@
       const resize = ref();
 
       provide('scroll-bar-wrap', wrap);
+
+      const style = computed(() => {
+        if (Array.isArray(props.wrapStyle)) {
+          return toObject(props.wrapStyle);
+        }
+        return props.wrapStyle;
+      });
 
       const handleScroll = () => {
         if (!props.native) {
@@ -97,14 +98,6 @@
         sizeHeight.value = heightPercentage < 100 ? heightPercentage + '%' : '';
         sizeWidth.value = widthPercentage < 100 ? widthPercentage + '%' : '';
       };
-
-      watch(
-        () => props.scrollHeight,
-        () => {
-          if (props.native) return;
-          update();
-        },
-      );
 
       onMounted(() => {
         if (props.native) return;
@@ -130,6 +123,7 @@
         moveY,
         sizeWidth,
         sizeHeight,
+        style,
         wrap,
         resize,
         update,

@@ -4,14 +4,13 @@ import { computed, ComputedRef, nextTick, Ref, ref, toRaw, unref, watch } from '
 import { ROW_KEY } from '../const';
 import { omit } from 'lodash-es';
 import { findNodeAll } from '/@/utils/helper/treeHelper';
-import type { Key } from 'ant-design-vue/lib/table/interface';
 
 export function useRowSelection(
   propsRef: ComputedRef<BasicTableProps>,
   tableData: Ref<Recordable[]>,
   emit: EmitType,
 ) {
-  const selectedRowKeysRef = ref<Key[]>([]);
+  const selectedRowKeysRef = ref<string[]>([]);
   const selectedRowRef = ref<Recordable[]>([]);
 
   const getRowSelectionRef = computed((): TableRowSelection | null => {
@@ -22,7 +21,7 @@ export function useRowSelection(
 
     return {
       selectedRowKeys: unref(selectedRowKeysRef),
-      onChange: (selectedRowKeys: Key[]) => {
+      onChange: (selectedRowKeys: string[]) => {
         setSelectedRowKeys(selectedRowKeys);
       },
       ...omit(rowSelection, ['onChange']),
@@ -31,7 +30,7 @@ export function useRowSelection(
 
   watch(
     () => unref(propsRef).rowSelection?.selectedRowKeys,
-    (v?: Key[]) => {
+    (v: string[]) => {
       setSelectedRowKeys(v);
     },
   );
@@ -63,8 +62,8 @@ export function useRowSelection(
     return unref(getAutoCreateKey) ? ROW_KEY : rowKey;
   });
 
-  function setSelectedRowKeys(rowKeys?: Key[]) {
-    selectedRowKeysRef.value = rowKeys || [];
+  function setSelectedRowKeys(rowKeys: string[]) {
+    selectedRowKeysRef.value = rowKeys;
     const allSelectedRows = findNodeAll(
       toRaw(unref(tableData)).concat(toRaw(unref(selectedRowRef))),
       (item) => rowKeys?.includes(item[unref(getRowKey) as string]),
@@ -73,7 +72,7 @@ export function useRowSelection(
       },
     );
     const trueSelectedRows: any[] = [];
-    rowKeys?.forEach((key: Key) => {
+    rowKeys?.forEach((key: string) => {
       const found = allSelectedRows.find((item) => item[unref(getRowKey) as string] === key);
       found && trueSelectedRows.push(found);
     });

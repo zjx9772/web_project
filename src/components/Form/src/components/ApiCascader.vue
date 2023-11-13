@@ -55,7 +55,7 @@
       labelField: propTypes.string.def('label'),
       valueField: propTypes.string.def('value'),
       childrenField: propTypes.string.def('children'),
-      apiParamKey: propTypes.string.def('parentCode'),
+      asyncFetchParamKey: propTypes.string.def('parentCode'),
       immediate: propTypes.bool.def(true),
       // init fetch params
       initFetchParams: {
@@ -141,7 +141,7 @@
         if (!api || !isFunction(api)) return;
         try {
           const res = await api({
-            [props.apiParamKey]: Reflect.get(targetOption, 'value'),
+            [props.asyncFetchParamKey]: Reflect.get(targetOption, 'value'),
           });
           if (Array.isArray(res)) {
             const children = generatorOptions(res);

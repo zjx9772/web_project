@@ -1,7 +1,7 @@
 <template>
   <div :class="prefixCls" class="relative w-full h-full px-4">
     <div class="flex items-center absolute right-4 top-4">
-      <AppDarkModeToggle class="enter-x mr-2" v-if="!sessionTimeout" />
+      <!-- <AppDarkModeToggle class="enter-x mr-2" v-if="!sessionTimeout" /> -->
       <AppLocalePicker
         class="text-white enter-x xl:text-gray-600"
         :show-text="false"
@@ -49,7 +49,8 @@
 </template>
 <script lang="ts" setup>
   import { computed } from 'vue';
-  import { AppLogo, AppLocalePicker, AppDarkModeToggle } from '/@/components/Application';
+  import { AppLogo } from '/@/components/Application';
+  import { AppLocalePicker } from '/@/components/Application';
   import LoginForm from './LoginForm.vue';
   import ForgetPasswordForm from './ForgetPasswordForm.vue';
   import RegisterForm from './RegisterForm.vue';
@@ -110,18 +111,12 @@
       -webkit-text-fill-color: #c9d1d9 !important;
       box-shadow: inherit !important;
     }
-
-    .ant-divider-inner-text {
-      color: @text-color-secondary;
-      font-size: 12px;
-    }
   }
 
   .@{prefix-cls} {
     min-height: 100%;
     overflow: hidden;
 
-    /* stylelint-disable-next-line media-query-no-invalid */
     @media (max-width: @screen-xl) {
       background-color: #293146;
 
@@ -142,7 +137,7 @@
       background-repeat: no-repeat;
       background-position: 100%;
       background-size: auto 100%;
-      /* stylelint-disable-next-line media-query-no-invalid */
+
       @media (max-width: @screen-xl) {
         display: none;
       }
@@ -194,19 +189,19 @@
 
     input:not([type='checkbox']) {
       min-width: 360px;
-      /* stylelint-disable-next-line media-query-no-invalid */
+
       @media (max-width: @screen-xl) {
         min-width: 320px;
       }
-      /* stylelint-disable-next-line media-query-no-invalid */
+
       @media (max-width: @screen-lg) {
         min-width: 260px;
       }
-      /* stylelint-disable-next-line media-query-no-invalid */
+
       @media (max-width: @screen-md) {
         min-width: 240px;
       }
-      /* stylelint-disable-next-line media-query-no-invalid */
+
       @media (max-width: @screen-sm) {
         min-width: 160px;
       }
@@ -214,6 +209,11 @@
 
     .@{countdown-prefix-cls} input {
       min-width: unset;
+    }
+
+    .ant-divider-inner-text {
+      color: @text-color-secondary;
+      font-size: 12px;
     }
   }
 </style>

@@ -2,13 +2,8 @@
   import { type Recordable, type Nullable } from '@vben/types';
   import type { PropType, Ref } from 'vue';
   import { computed, defineComponent, toRefs, unref } from 'vue';
-  import {
-    isComponentFormSchema,
-    type FormActionType,
-    type FormProps,
-    type FormSchemaInner as FormSchema,
-  } from '../types/form';
-  import type { Rule as ValidationRule } from 'ant-design-vue/lib/form/interface';
+  import type { FormActionType, FormProps, FormSchema } from '../types/form';
+  import type { ValidationRule } from 'ant-design-vue/lib/form/Form';
   import type { TableActionType } from '/@/components/Table';
   import { Col, Divider, Form } from 'ant-design-vue';
   import { componentMap } from '../componentMap';
@@ -164,10 +159,7 @@
         const joinLabel = Reflect.has(props.schema, 'rulesMessageJoinLabel')
           ? rulesMessageJoinLabel
           : globalRulesMessageJoinLabel;
-        const assertLabel = joinLabel ? label : '';
-        const defaultMsg = component
-          ? createPlaceholderMessage(component) + assertLabel
-          : assertLabel;
+        const defaultMsg = createPlaceholderMessage(component) + `${joinLabel ? label : ''}`;
 
         function validator(rule: any, value: any) {
           const msg = rule.message || defaultMsg;
@@ -225,6 +217,10 @@
             rule.required = false;
           }
           if (component) {
+            if (!Reflect.has(rule, 'type')) {
+              rule.type = component === 'InputNumber' ? 'number' : 'string';
+            }
+
             rule.message = rule.message || defaultMsg;
 
             if (component.includes('Input') || component.includes('Textarea')) {
@@ -246,9 +242,6 @@
       }
 
       function renderComponent() {
-        if (!isComponentFormSchema(props.schema)) {
-          return null;
-        }
         const {
           renderComponentContent,
           component,
@@ -277,6 +270,7 @@
         const { autoSetPlaceHolder, size } = props.formProps;
         const propsData: Recordable<any> = {
           allowClear: true,
+          getPopupContainer: (trigger: Element) => trigger.parentNode,
           size,
           ...unref(getComponentsProps),
           disabled: unref(getDisable),
@@ -305,7 +299,7 @@
           return <Comp {...compAttr} />;
         }
         const compSlot = isFunction(renderComponentContent)
-          ? { ...renderComponentContent(unref(getValues), { disabled: unref(getDisable) }) }
+          ? { ...renderComponentContent(unref(getValues)) }
           : {
               default: () => renderComponentContent,
             };
@@ -339,7 +333,7 @@
         const { itemProps, slot, render, field, suffix, component } = props.schema;
         const { labelCol, wrapperCol } = unref(itemLabelWidthProp);
         const { colon } = props.formProps;
-        const opts = { disabled: unref(getDisable) };
+
         if (component === 'Divider') {
           return (
             <Col span={24}>
@@ -349,9 +343,9 @@
         } else {
           const getContent = () => {
             return slot
-              ? getSlot(slots, slot, unref(getValues), opts)
+              ? getSlot(slots, slot, unref(getValues))
               : render
-              ? render(unref(getValues), opts)
+              ? render(unref(getValues))
               : renderComponent();
           };
 
@@ -359,7 +353,7 @@
           const getSuffix = isFunction(suffix) ? suffix(unref(getValues)) : suffix;
 
           // TODO 自定义组件验证会出现问题，因此这里框架默认将自定义组件设置手动触发验证，如果其他组件还有此问题请手动设置autoLink=false
-          if (component && NO_AUTO_LINK_COMPONENTS.includes(component)) {
+          if (NO_AUTO_LINK_COMPONENTS.includes(component)) {
             props.schema &&
               (props.schema.itemProps! = {
                 autoLink: false,
@@ -388,8 +382,8 @@
       }
 
       return () => {
-        const { colProps = {}, colSlot, renderColContent, component, slot } = props.schema;
-        if (!component || (!componentMap.has(component) && !slot)) {
+        const { colProps = {}, colSlot, renderColContent, component } = props.schema;
+        if (!componentMap.has(component)) {
           return null;
         }
 
@@ -397,13 +391,12 @@
         const realColProps = { ...baseColProps, ...colProps };
         const { isIfShow, isShow } = getShow();
         const values = unref(getValues);
-        const opts = { disabled: unref(getDisable) };
 
         const getContent = () => {
           return colSlot
-            ? getSlot(slots, colSlot, values, opts)
+            ? getSlot(slots, colSlot, values)
             : renderColContent
-            ? renderColContent(values, opts)
+            ? renderColContent(values)
             : renderItem();
         };
 

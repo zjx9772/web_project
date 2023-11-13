@@ -33,7 +33,6 @@
   import { CreateContextOptions } from '/@/components/ContextMenu';
   import { treeEmits, treeProps } from './types/tree';
   import { createBEM } from '/@/utils/bem';
-  import type { TreeProps } from 'ant-design-vue/es/tree/Tree';
 
   export default defineComponent({
     name: 'BasicTree',
@@ -107,7 +106,7 @@
           },
           onRightClick: handleRightClick,
         };
-        return omit(propsData, 'treeData', 'class') as TreeProps;
+        return omit(propsData, 'treeData', 'class');
       });
 
       const getTreeData = computed((): TreeItem[] =>
@@ -130,7 +129,7 @@
         getSelectedNode,
       } = useTree(treeDataRef, getFieldNames);
 
-      function getIcon(params: TreeItem, icon?: string) {
+      function getIcon(params: Recordable, icon?: string) {
         if (!icon) {
           if (props.renderIcon && isFunction(props.renderIcon)) {
             return props.renderIcon(params);
@@ -320,7 +319,6 @@
       });
 
       const instance: TreeActionType = {
-        getTreeData: () => treeDataRef,
         setExpandedKeys,
         getExpandedKeys,
         setSelectedKeys,
@@ -394,26 +392,16 @@
           ) : (
             title
           );
-
-          const iconDom = icon ? (
-            <TreeIcon icon={icon} />
-          ) : slots.icon ? (
-            <span class="mr-1">{getSlot(slots, 'icon')}</span>
-          ) : null;
-
           item[titleField] = (
             <span
               class={`${bem('title')} pl-2`}
               onClick={handleClickNode.bind(null, item[keyField], item[childrenField])}
             >
               {slots?.title ? (
-                <>
-                  {iconDom}
-                  {getSlot(slots, 'title', item)}
-                </>
+                getSlot(slots, 'title', item)
               ) : (
                 <>
-                  {iconDom}
+                  {icon && <TreeIcon icon={icon} />}
                   {titleDom}
                   <span class={bem('actions')}>{renderAction(item)}</span>
                 </>
@@ -455,9 +443,7 @@
               tip="加载中..."
             >
               <ScrollContainer style={scrollStyle} v-show={!unref(getNotFound)}>
-                <Tree {...unref(getBindValues)} showIcon={false} treeData={treeData.value}>
-                  {extendSlots(slots, ['title'])}
-                </Tree>
+                <Tree {...unref(getBindValues)} showIcon={false} treeData={treeData.value} />
               </ScrollContainer>
               <Empty
                 v-show={unref(getNotFound)}

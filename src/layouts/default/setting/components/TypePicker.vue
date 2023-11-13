@@ -25,7 +25,6 @@
   import { useDesign } from '/@/hooks/web/useDesign';
 
   import { menuTypeList } from '../enum';
-
   export default defineComponent({
     name: 'MenuTypePicker',
     components: { Tooltip },

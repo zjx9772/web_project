@@ -10,7 +10,7 @@ import {
   InputNumberItem,
 } from './components';
 
-import { AppDarkModeToggle } from '/@/components/Application';
+// import { AppDarkModeToggle } from '/@/components/Application';
 
 import { MenuTypeEnum, TriggerEnum } from '/@/enums/menuEnum';
 
@@ -89,8 +89,7 @@ export default defineComponent({
       getShowSearch,
     } = useHeaderSetting();
 
-    const { getShowMultipleTab, getShowQuick, getShowRedo, getShowFold, getAutoCollapse } =
-      useMultipleTabSetting();
+    const { getShowMultipleTab, getShowQuick, getShowRedo, getShowFold } = useMultipleTabSetting();
 
     const getShowMenuRef = computed(() => {
       return unref(getShowMenu) && !unref(getIsHorizontal);
@@ -221,12 +220,6 @@ export default defineComponent({
             event={HandlerEnum.MENU_FIXED}
             def={unref(getMenuFixed)}
             disabled={!unref(getShowMenuRef) || unref(getIsMixSidebar)}
-          />
-          <SwitchItem
-            title={t('layout.setting.autoCollapseTabsInFold')}
-            event={HandlerEnum.TABS_AUTO_COLLAPSE}
-            def={unref(getAutoCollapse)}
-            disabled={!unref(getShowMultipleTab)}
           />
           <SelectItem
             title={t('layout.setting.mixSidebarTrigger')}
@@ -411,7 +404,7 @@ export default defineComponent({
         class="setting-drawer"
       >
         {unref(getShowDarkModeToggle) && <Divider>{() => t('layout.setting.darkMode')}</Divider>}
-        {unref(getShowDarkModeToggle) && <AppDarkModeToggle class="mx-auto" />}
+        {/* {unref(getShowDarkModeToggle) && <AppDarkModeToggle class="mx-auto" />} */}
         <Divider>{() => t('layout.setting.navMode')}</Divider>
         {renderSidebar()}
         {/* <Divider>{() => t('layout.setting.sysTheme')}</Divider>

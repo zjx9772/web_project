@@ -48,7 +48,6 @@
       });
 
       function handleChange(e) {
-        emit('change', e.target.value);
         innerValueRef.value = e.target.value;
       }
 

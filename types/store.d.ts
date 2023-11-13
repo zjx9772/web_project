@@ -10,11 +10,6 @@ export interface LockInfo {
   isLock?: boolean;
 }
 
-export interface ApiAddress {
-  key: string;
-  val: string;
-}
-
 // Error-log information
 export interface ErrorLogInfo {
   // Type of error

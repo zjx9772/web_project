@@ -39,7 +39,8 @@
                 </div>
               </template>
               <template #actions>
-                <EditOutlined />
+                <!--              <SettingOutlined key="setting" />-->
+                <EditOutlined key="edit" />
                 <Dropdown
                   :trigger="['hover']"
                   :dropMenuList="[
@@ -54,13 +55,13 @@
                   ]"
                   popconfirm
                 >
-                  <EllipsisOutlined />
+                  <EllipsisOutlined key="ellipsis" />
                 </Dropdown>
               </template>
 
               <CardMeta>
                 <template #title>
-                  <TypographyParagraph :content="item.name" :ellipsis="{ tooltip: item.address }" />
+                  <TypographyText :content="item.name" :ellipsis="{ tooltip: item.address }" />
                 </template>
                 <template #avatar>
                   <Avatar :src="item.avatar" />
@@ -92,7 +93,7 @@
 
   const ListItem = List.Item;
   const CardMeta = Card.Meta;
-  const TypographyParagraph = Typography.Paragraph;
+  const TypographyText = Typography.Text;
   // 获取slider属性
   const sliderProp = computed(() => useSlider(4));
   // 组件接收参数
@@ -156,22 +157,22 @@
     pageSize,
     current: page,
     total,
-    showTotal: (total: number) => `总 ${total} 条`,
+    showTotal: (total) => `总 ${total} 条`,
     onChange: pageChange,
     onShowSizeChange: pageSizeChange,
   });
 
-  function pageChange(p: number, pz: number) {
+  function pageChange(p, pz) {
     page.value = p;
     pageSize.value = pz;
     fetch();
   }
-  function pageSizeChange(_current, size: number) {
+  function pageSizeChange(_current, size) {
     pageSize.value = size;
     fetch();
   }
 
-  async function handleDelete(id: number) {
+  async function handleDelete(id) {
     emit('delete', id);
   }
 </script>

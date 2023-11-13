@@ -41,7 +41,6 @@ export interface MultiTabsSetting {
   canDrag: boolean;
   showRedo: boolean;
   showFold: boolean;
-  autoCollapse: boolean;
 }
 
 export interface HeaderSetting {
@@ -58,7 +57,6 @@ export interface HeaderSetting {
   // Show message center button
   showNotice: boolean;
   showSearch: boolean;
-  showApi: boolean;
 }
 
 export interface LocaleSetting {

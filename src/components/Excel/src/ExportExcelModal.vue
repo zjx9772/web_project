@@ -66,18 +66,18 @@
     components: { BasicModal, BasicForm },
     emits: ['success', 'register'],
     setup(_, { emit }) {
-      const [registerForm, { validate }] = useForm();
+      const [registerForm, { validateFields }] = useForm();
       const [registerModal, { closeModal }] = useModalInner();
 
-      const handleOk = async () => {
-        const res = await validate<ExportModalResult>();
+      async function handleOk() {
+        const res = (await validateFields()) as ExportModalResult;
         const { filename, bookType } = res;
         emit('success', {
           filename: `${filename.split('.').shift()}.${bookType}`,
           bookType,
         });
         closeModal();
-      };
+      }
 
       return {
         schemas,

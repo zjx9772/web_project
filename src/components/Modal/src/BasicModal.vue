@@ -34,9 +34,9 @@
       :loading-tip="getProps.loadingTip"
       :minHeight="getProps.minHeight"
       :height="getWrapperHeight"
-      :open="openRef"
+      :visible="visibleRef"
       :modalFooterHeight="footer !== undefined && !footer ? 0 : undefined"
-      v-bind="omit(getProps.wrapperProps, 'open', 'height', 'modalFooterHeight')"
+      v-bind="omit(getProps.wrapperProps, 'visible', 'height', 'modalFooterHeight')"
       @ext-height="handleExtHeight"
       @height-change="handleHeightChange"
     >
@@ -79,9 +79,9 @@
     components: { Modal, ModalWrapper, ModalClose, ModalFooter, ModalHeader },
     inheritAttrs: false,
     props: basicProps,
-    emits: ['open-change', 'height-change', 'cancel', 'ok', 'register', 'update:open'],
+    emits: ['visible-change', 'height-change', 'cancel', 'ok', 'register', 'update:visible'],
     setup(props, { emit, attrs }) {
-      const openRef = ref(false);
+      const visibleRef = ref(false);
       const propsRef = ref<Partial<ModalProps> | null>(null);
       const modalWrapperRef = ref<any>(null);
       const { prefixCls } = useDesign('basic-modal');
@@ -90,7 +90,7 @@
       const extHeightRef = ref(0);
       const modalMethods: ModalMethods = {
         setModalProps,
-        emitOpen: undefined,
+        emitVisible: undefined,
         redoModalHeight: () => {
           nextTick(() => {
             if (unref(modalWrapperRef)) {
@@ -123,7 +123,7 @@
       const getProps = computed((): Recordable => {
         const opt = {
           ...unref(getMergeProps),
-          open: unref(openRef),
+          visible: unref(visibleRef),
           okButtonProps: undefined,
           cancelButtonProps: undefined,
           title: undefined,
@@ -138,10 +138,10 @@
         const attr = {
           ...attrs,
           ...unref(getMergeProps),
-          open: unref(openRef),
+          visible: unref(visibleRef),
         };
-        attr['wrapClassName'] =
-          `${attr?.['wrapClassName'] || ''} ${unref(getWrapClassName)}` + 'vben-basic-modal-wrap';
+        attr['wrapClassName'] = `${attr?.['wrapClassName'] || ''} ${unref(getWrapClassName)}`;
+
         if (unref(fullScreenRef)) {
           return omit(attr, ['height', 'title']);
         }
@@ -154,16 +154,16 @@
       });
 
       watchEffect(() => {
-        openRef.value = !!props.open;
+        visibleRef.value = !!props.visible;
         fullScreenRef.value = !!props.defaultFullscreen;
       });
 
       watch(
-        () => unref(openRef),
+        () => unref(visibleRef),
         (v) => {
-          emit('open-change', v);
-          emit('update:open', v);
-          instance && modalMethods.emitOpen?.(v, instance.uid);
+          emit('visible-change', v);
+          emit('update:visible', v);
+          instance && modalMethods.emitVisible?.(v, instance.uid);
           nextTick(() => {
             if (props.scrollTop && v && unref(modalWrapperRef)) {
               (unref(modalWrapperRef) as any).scrollTop();
@@ -182,11 +182,11 @@
         if ((e.target as HTMLElement)?.classList?.contains(prefixCls + '-close--custom')) return;
         if (props.closeFunc && isFunction(props.closeFunc)) {
           const isClose: boolean = await props.closeFunc();
-          openRef.value = !isClose;
+          visibleRef.value = !isClose;
           return;
         }
 
-        openRef.value = false;
+        visibleRef.value = false;
         emit('cancel', e);
       }
 
@@ -196,8 +196,8 @@
       function setModalProps(props: Partial<ModalProps>): void {
         // Keep the last setModalProps
         propsRef.value = deepMerge(unref(propsRef) || ({} as any), props);
-        if (Reflect.has(props, 'open')) {
-          openRef.value = !!props.open;
+        if (Reflect.has(props, 'visible')) {
+          visibleRef.value = !!props.visible;
         }
         if (Reflect.has(props, 'defaultFullscreen')) {
           fullScreenRef.value = !!props.defaultFullscreen;
@@ -230,7 +230,7 @@
         fullScreenRef,
         getMergeProps,
         handleOk,
-        openRef,
+        visibleRef,
         omit,
         modalWrapperRef,
         handleExtHeight,

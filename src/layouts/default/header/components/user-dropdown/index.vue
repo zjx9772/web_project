@@ -3,7 +3,7 @@
     <span :class="[prefixCls, `${prefixCls}--${theme}`]" class="flex">
       <img :class="`${prefixCls}__header`" :src="getUserInfo.avatar" />
       <span :class="`${prefixCls}__info hidden md:block`">
-        <span :class="`${prefixCls}__name`" class="truncate">
+        <span :class="`${prefixCls}__name  `" class="truncate">
           {{ getUserInfo.realName }}
         </span>
       </span>
@@ -19,12 +19,6 @@
         />
         <MenuDivider v-if="getShowDoc" />
         <MenuItem
-          v-if="getShowApi"
-          key="api"
-          :text="t('layout.header.dropdownChangeApi')"
-          icon="ant-design:swap-outlined"
-        />
-        <MenuItem
           v-if="getUseLockPage"
           key="lock"
           :text="t('layout.header.tooltipLock')"
@@ -39,7 +33,6 @@
     </template>
   </Dropdown>
   <LockAction @register="register" />
-  <ChangeApi @register="registerApi" />
 </template>
 <script lang="ts">
   // components
@@ -62,7 +55,7 @@
 
   import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
 
-  type MenuEvent = 'logout' | 'doc' | 'lock' | 'api';
+  type MenuEvent = 'logout' | 'doc' | 'lock';
 
   export default defineComponent({
     name: 'UserDropdown',
@@ -72,7 +65,6 @@
       MenuItem: createAsyncComponent(() => import('./DropMenuItem.vue')),
       MenuDivider: Menu.Divider,
       LockAction: createAsyncComponent(() => import('../lock/LockModal.vue')),
-      ChangeApi: createAsyncComponent(() => import('../ChangeApi/index.vue')),
     },
     props: {
       theme: propTypes.oneOf(['dark', 'light']),
@@ -80,7 +72,7 @@
     setup() {
       const { prefixCls } = useDesign('header-user-dropdown');
       const { t } = useI18n();
-      const { getShowDoc, getUseLockPage, getShowApi } = useHeaderSetting();
+      const { getShowDoc, getUseLockPage } = useHeaderSetting();
       const userStore = useUserStore();
 
       const getUserInfo = computed(() => {
@@ -89,14 +81,9 @@
       });
 
       const [register, { openModal }] = useModal();
-      const [registerApi, { openModal: openApiModal }] = useModal();
 
       function handleLock() {
         openModal(true);
-      }
-
-      function handleApi() {
-        openApiModal(true, {});
       }
 
       //  login out
@@ -120,9 +107,6 @@
           case 'lock':
             handleLock();
             break;
-          case 'api':
-            handleApi();
-            break;
         }
       }
 
@@ -132,9 +116,7 @@
         getUserInfo,
         handleMenuClick,
         getShowDoc,
-        getShowApi,
         register,
-        registerApi,
         getUseLockPage,
       };
     },

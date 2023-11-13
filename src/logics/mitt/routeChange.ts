@@ -6,11 +6,9 @@ import { mitt } from '/@/utils/mitt';
 import type { RouteLocationNormalized } from 'vue-router';
 import { getRawRoute } from '/@/utils';
 
-const key = Symbol();
+const emitter = mitt();
 
-const emitter = mitt<{
-  [key]: RouteLocationNormalized;
-}>();
+const key = Symbol();
 
 let lastChangeTab: RouteLocationNormalized;
 

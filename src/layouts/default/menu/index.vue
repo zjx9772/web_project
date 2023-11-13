@@ -15,7 +15,7 @@
   import { useSplitMenu } from './useLayoutMenu';
   import { openWindow } from '/@/utils';
   import { propTypes } from '/@/utils/propTypes';
-  import { isHttpUrl } from '/@/utils/is';
+  import { isUrl } from '/@/utils/is';
   import { useRootSetting } from '/@/hooks/setting/useRootSetting';
   import { useAppInject } from '/@/hooks/web/useAppInject';
   import { useDesign } from '/@/hooks/web/useDesign';
@@ -119,7 +119,7 @@
        * @param menu
        */
       async function beforeMenuClickFn(path: string) {
-        if (!isHttpUrl(path)) {
+        if (!isUrl(path)) {
           return true;
         }
         openWindow(path);

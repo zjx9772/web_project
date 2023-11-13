@@ -1,5 +1,5 @@
 <template>
-  <div v-if="getShow">
+  <template v-if="getShow">
     <LoginFormTitle class="enter-x" />
     <Form class="p-4 enter-x" :model="formData" :rules="getFormRules" ref="formRef">
       <FormItem name="account" class="enter-x">
@@ -63,7 +63,7 @@
         {{ t('sys.login.backSignIn') }}
       </Button>
     </Form>
-  </div>
+  </template>
 </template>
 <script lang="ts" setup>
   import { reactive, ref, unref, computed } from 'vue';

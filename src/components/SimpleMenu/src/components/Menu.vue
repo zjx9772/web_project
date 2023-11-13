@@ -21,7 +21,7 @@
 
   import { useDesign } from '/@/hooks/web/useDesign';
   import { propTypes } from '/@/utils/propTypes';
-  import { createSimpleRootMenuContext, type MenuEmitterEvents } from './useSimpleMenuContext';
+  import { createSimpleRootMenuContext } from './useSimpleMenuContext';
   import { mitt } from '/@/utils/mitt';
 
   export default defineComponent({
@@ -45,11 +45,11 @@
     },
     emits: ['select', 'open-change'],
     setup(props, { emit }) {
-      const rootMenuEmitter = mitt<MenuEmitterEvents>();
+      const rootMenuEmitter = mitt();
       const instance = getCurrentInstance();
 
       const currentActiveName = ref<string | number>('');
-      const openedNames = ref<(string | number)[]>([]);
+      const openedNames = ref<string[]>([]);
 
       const { prefixCls } = useDesign('menu');
 
@@ -95,13 +95,13 @@
         rootMenuEmitter.emit('on-update-opened', openedNames.value);
       }
 
-      function addSubMenu(name: string | number) {
+      function addSubMenu(name: string) {
         if (openedNames.value.includes(name)) return;
         openedNames.value.push(name);
         updateOpened();
       }
 
-      function removeSubMenu(name: string | number) {
+      function removeSubMenu(name: string) {
         openedNames.value = openedNames.value.filter((item) => item !== name);
         updateOpened();
       }
@@ -131,7 +131,7 @@
       onMounted(() => {
         openedNames.value = !props.collapse ? [...props.openNames] : [];
         updateOpened();
-        rootMenuEmitter.on('on-menu-item-select', (name: string | number) => {
+        rootMenuEmitter.on('on-menu-item-select', (name: string) => {
           currentActiveName.value = name;
 
           nextTick(() => {

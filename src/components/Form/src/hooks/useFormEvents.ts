@@ -1,8 +1,16 @@
 import type { ComputedRef, Ref } from 'vue';
-import type { FormProps, FormSchemaInner as FormSchema, FormActionType } from '../types/form';
+import type { FormProps, FormSchema, FormActionType } from '../types/form';
 import type { NamePath } from 'ant-design-vue/lib/form/interface';
 import { unref, toRaw, nextTick } from 'vue';
-import { isArray, isFunction, isObject, isString, isDef, isNil, isEmpty } from '/@/utils/is';
+import {
+  isArray,
+  isFunction,
+  isObject,
+  isString,
+  isDef,
+  isNullOrUnDef,
+  isEmpty,
+} from '/@/utils/is';
 import { deepMerge } from '/@/utils';
 import { dateItemType, handleInputNumberValue, defaultValueComponents } from '../helper';
 import { dateUtil } from '/@/utils/dateUtil';
@@ -79,35 +87,23 @@ export function useFormEvents({
 
     Object.keys(formModel).forEach((key) => {
       const schema = unref(getSchema).find((item) => item.field === key);
-      const defaultValueObj = schema?.defaultValueObj;
-      const fieldKeys = Object.keys(defaultValueObj || {});
-      if (fieldKeys.length) {
-        fieldKeys.map((field) => {
-          formModel[field] = defaultValueObj![field];
-        });
-      }
-      formModel[key] = getDefaultValue(schema, defaultValueRef, key);
+      const isInput = schema?.component && defaultValueComponents.includes(schema.component);
+      const defaultValue = cloneDeep(defaultValueRef.value[key]);
+      formModel[key] = isInput ? defaultValue || '' : defaultValue;
     });
     nextTick(() => clearValidate());
 
     emit('reset', toRaw(formModel));
     submitOnReset && handleSubmit();
   }
-  // 获取表单fields
-  const getAllFields = () =>
-    unref(getSchema)
-      .map((item) => [...(item.fields || []), item.field])
-      .flat(1)
-      .filter(Boolean);
+
   /**
    * @description: Set form value
    */
   async function setFieldsValue(values: Recordable): Promise<void> {
-    if (Object.keys(values).length === 0) {
-      return;
-    }
-
-    const fields = getAllFields();
+    const fields = unref(getSchema)
+      .map((item) => item.field)
+      .filter(Boolean);
 
     // key 支持 a.b.c 的嵌套写法
     const delimiter = '.';
@@ -117,7 +113,7 @@ export function useFormEvents({
     fields.forEach((key) => {
       const schema = unref(getSchema).find((item) => item.field === key);
       let value = get(values, key);
-      const hasKey = Reflect.has(values, key);
+      const hasKey = !!get(values, key);
 
       value = handleInputNumberValue(schema?.component, value);
       const { componentProps } = schema || {};
@@ -214,22 +210,21 @@ export function useFormEvents({
     first = false,
   ) {
     const schemaList: FormSchema[] = cloneDeep(unref(getSchema));
-    const addSchemaIds: string[] = Array.isArray(schema)
-      ? schema.map((item) => item.field)
-      : [schema.field];
-    if (schemaList.find((item) => addSchemaIds.includes(item.field))) {
-      error('There are schemas that have already been added');
-      return;
-    }
+
     const index = schemaList.findIndex((schema) => schema.field === prefixField);
     const _schemaList = isObject(schema) ? [schema as FormSchema] : (schema as FormSchema[]);
     if (!prefixField || index === -1 || first) {
       first ? schemaList.unshift(..._schemaList) : schemaList.push(..._schemaList);
-    } else if (index !== -1) {
+      schemaRef.value = schemaList;
+      _setDefaultValue(schema);
+      return;
+    }
+    if (index !== -1) {
       schemaList.splice(index + 1, 0, ..._schemaList);
     }
-    schemaRef.value = schemaList;
     _setDefaultValue(schema);
+
+    schemaRef.value = schemaList;
   }
 
   async function resetSchema(data: Partial<FormSchema> | Partial<FormSchema>[]) {
@@ -309,9 +304,9 @@ export function useFormEvents({
         item.component != 'Divider' &&
         Reflect.has(item, 'field') &&
         item.field &&
-        !isNil(item.defaultValue) &&
+        !isNullOrUnDef(item.defaultValue) &&
         (!(item.field in currentFieldsValue) ||
-          isNil(currentFieldsValue[item.field]) ||
+          isNullOrUnDef(currentFieldsValue[item.field]) ||
           isEmpty(currentFieldsValue[item.field]))
       ) {
         obj[item.field] = item.defaultValue;
@@ -331,24 +326,16 @@ export function useFormEvents({
    */
   function itemIsDateType(key: string) {
     return unref(getSchema).some((item) => {
-      return item.field === key && item.component ? dateItemType.includes(item.component) : false;
+      return item.field === key ? dateItemType.includes(item.component) : false;
     });
   }
 
   async function validateFields(nameList?: NamePath[] | undefined) {
-    const values = await unref(formElRef)?.validateFields(nameList);
-    return handleFormValues(values);
+    return unref(formElRef)?.validateFields(nameList);
   }
 
-  async function validate(nameList?: NamePath[] | false | undefined) {
-    let _nameList: any;
-    if (nameList === undefined) {
-      _nameList = getAllFields();
-    } else {
-      _nameList = nameList === Array.isArray(nameList) ? nameList : undefined;
-    }
-    const values = await unref(formElRef)?.validate(_nameList);
-    return handleFormValues(values);
+  async function validate(nameList?: NamePath[] | undefined) {
+    return await unref(formElRef)?.validate(nameList);
   }
 
   async function clearValidate(name?: string | string[]) {
@@ -373,7 +360,8 @@ export function useFormEvents({
     if (!formEl) return;
     try {
       const values = await validate();
-      emit('submit', values);
+      const res = handleFormValues(values);
+      emit('submit', res);
     } catch (error: any) {
       if (error?.outOfDate === false && error?.errorFields) {
         return;
@@ -396,33 +384,4 @@ export function useFormEvents({
     setFieldsValue,
     scrollToField,
   };
-}
-
-function getDefaultValue(
-  schema: FormSchema | undefined,
-  defaultValueRef: UseFormActionContext['defaultValueRef'],
-  key: string,
-) {
-  let defaultValue = cloneDeep(defaultValueRef.value[key]);
-  const isInput = checkIsInput(schema);
-  if (isInput) {
-    return defaultValue || '';
-  }
-  if (!defaultValue && schema && checkIsRangeSlider(schema)) {
-    defaultValue = [0, 0];
-  }
-  if (!defaultValue && schema && schema.component === 'ApiTree') {
-    defaultValue = [];
-  }
-  return defaultValue;
-}
-
-function checkIsRangeSlider(schema: FormSchema) {
-  if (schema.component === 'Slider' && schema.componentProps && 'range' in schema.componentProps) {
-    return true;
-  }
-}
-
-function checkIsInput(schema?: FormSchema) {
-  return schema?.component && defaultValueComponents.includes(schema.component);
 }

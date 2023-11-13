@@ -14,7 +14,6 @@
             <a-popconfirm
               v-if="popconfirm && item.popConfirm"
               v-bind="getPopConfirmAttrs(item.popConfirm)"
-              :disabled="item.disabled"
             >
               <template #icon v-if="item.popConfirm.icon">
                 <Icon :icon="item.popConfirm.icon" />

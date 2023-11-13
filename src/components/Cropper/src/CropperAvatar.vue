@@ -20,12 +20,11 @@
       {{ btnText ? btnText : t('component.cropper.selectImage') }}
     </a-button>
 
-    <CropperModal
+    <CopperModal
       @register="register"
       @upload-success="handleUploadSuccess"
       :uploadApi="uploadApi"
       :src="sourceValue"
-      :size="size"
     />
   </div>
 </template>
@@ -40,7 +39,7 @@
     watch,
     PropType,
   } from 'vue';
-  import CropperModal from './CropperModal.vue';
+  import CopperModal from './CopperModal.vue';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useModal } from '/@/components/Modal';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -54,16 +53,12 @@
     showBtn: { type: Boolean, default: true },
     btnProps: { type: Object as PropType<ButtonProps> },
     btnText: { type: String, default: '' },
-    uploadApi: {
-      type: Function as PropType<({ file, name }: { file: Blob; name: string }) => Promise<void>>,
-    },
-
-    size: { type: Number, default: 5 },
+    uploadApi: { type: Function as PropType<({ file: Blob, name: string }) => Promise<void>> },
   };
 
   export default defineComponent({
     name: 'CropperAvatar',
-    components: { CropperModal, Icon },
+    components: { CopperModal, Icon },
     props,
     emits: ['update:value', 'change'],
     setup(props, { emit, expose }) {

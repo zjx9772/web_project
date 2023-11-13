@@ -1,5 +1,5 @@
 <template>
-  <span class="edit-header-cell">
+  <span>
     <slot></slot>
     {{ title }}
     <FormOutlined />

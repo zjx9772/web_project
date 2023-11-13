@@ -38,18 +38,19 @@
   </Form>
 </template>
 <script lang="ts">
-  import type { FormActionType, FormProps, FormSchemaInner as FormSchema } from './types/form';
+  import type { FormActionType, FormProps, FormSchema } from './types/form';
   import type { AdvanceState } from './types/hooks';
   import type { Ref } from 'vue';
 
   import { defineComponent, reactive, ref, computed, unref, onMounted, watch, nextTick } from 'vue';
-  import { Form, Row, type FormProps as AntFormProps } from 'ant-design-vue';
+  import { Form, Row } from 'ant-design-vue';
   import FormItem from './components/FormItem.vue';
   import FormAction from './components/FormAction.vue';
 
   import { dateItemType } from './helper';
   import { dateUtil } from '/@/utils/dateUtil';
 
+  // import { cloneDeep } from 'lodash-es';
   import { deepMerge } from '/@/utils';
 
   import { useFormValues } from './hooks/useFormValues';
@@ -82,15 +83,15 @@
 
       const defaultValueRef = ref({});
       const isInitedDefaultRef = ref(false);
-      const propsRef = ref<Partial<FormProps>>();
+      const propsRef = ref<Partial<FormProps>>({});
       const schemaRef = ref<FormSchema[] | null>(null);
       const formElRef = ref<FormActionType | null>(null);
 
       const { prefixCls } = useDesign('basic-form');
 
       // Get the basic configuration of the form
-      const getProps = computed(() => {
-        return { ...props, ...unref(propsRef) } as FormProps;
+      const getProps = computed((): FormProps => {
+        return { ...props, ...unref(propsRef) };
       });
 
       const getFormClass = computed(() => {
@@ -111,35 +112,20 @@
         };
       });
 
-      const getBindValue = computed(
-        () => ({ ...attrs, ...props, ...unref(getProps) }) as AntFormProps,
-      );
+      const getBindValue = computed(() => ({ ...attrs, ...props, ...unref(getProps) }));
 
       const getSchema = computed((): FormSchema[] => {
         const schemas: FormSchema[] = unref(schemaRef) || (unref(getProps).schemas as any);
         for (const schema of schemas) {
-          const {
-            defaultValue,
-            component,
-            componentProps,
-            isHandleDateDefaultValue = true,
-          } = schema;
+          const { defaultValue, component, isHandleDateDefaultValue = true } = schema;
           // handle date type
-          if (
-            isHandleDateDefaultValue &&
-            defaultValue &&
-            component &&
-            dateItemType.includes(component)
-          ) {
-            const valueFormat = componentProps ? componentProps['valueFormat'] : null;
+          if (isHandleDateDefaultValue && defaultValue && dateItemType.includes(component)) {
             if (!Array.isArray(defaultValue)) {
-              schema.defaultValue = valueFormat
-                ? dateUtil(defaultValue).format(valueFormat)
-                : dateUtil(defaultValue);
+              schema.defaultValue = dateUtil(defaultValue);
             } else {
               const def: any[] = [];
               defaultValue.forEach((item) => {
-                def.push(valueFormat ? dateUtil(item).format(valueFormat) : dateUtil(item));
+                def.push(dateUtil(item));
               });
               schema.defaultValue = def;
             }
@@ -309,10 +295,7 @@
         formActionType: formActionType as any,
         setFormModel,
         getFormClass,
-        getFormActionBindProps: computed(
-          () =>
-            ({ ...getProps.value, ...advanceState }) as InstanceType<typeof FormAction>['$props'],
-        ),
+        getFormActionBindProps: computed(() => ({ ...getProps.value, ...advanceState })),
         fieldsIsAdvancedMap,
         ...formActionType,
       };

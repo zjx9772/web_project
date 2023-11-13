@@ -1,9 +1,9 @@
-import { isArray, isFunction, isEmpty, isObject, isString, isNil } from '/@/utils/is';
+import { isArray, isFunction, isObject, isString, isNullOrUnDef } from '/@/utils/is';
 import { dateUtil } from '/@/utils/dateUtil';
 import { unref } from 'vue';
 import type { Ref, ComputedRef } from 'vue';
-import type { FormProps, FormSchemaInner as FormSchema } from '../types/form';
-import { cloneDeep, get, set, unset } from 'lodash-es';
+import type { FormProps, FormSchema } from '../types/form';
+import { cloneDeep, set } from 'lodash-es';
 
 interface UseFormValuesContext {
   defaultValueRef: Ref<any>;
@@ -106,51 +106,29 @@ export function useFormValues({
         continue;
       }
       // If the value to be converted is empty, remove the field
-      if (!get(values, field)) {
-        unset(values, field);
+      if (!values[field]) {
+        Reflect.deleteProperty(values, field);
         continue;
       }
 
-      const [startTime, endTime]: string[] = get(values, field);
+      const [startTime, endTime]: string[] = values[field];
 
       const [startTimeFormat, endTimeFormat] = Array.isArray(format) ? format : [format, format];
 
-      if (!isNil(startTime) && !isEmpty(startTime)) {
-        set(values, startTimeKey, formatTime(startTime, startTimeFormat));
-      }
-      if (!isNil(endTime) && !isEmpty(endTime)) {
-        set(values, endTimeKey, formatTime(endTime, endTimeFormat));
-      }
-      unset(values, field);
+      values[startTimeKey] = dateUtil(startTime).format(startTimeFormat);
+      values[endTimeKey] = dateUtil(endTime).format(endTimeFormat);
+      Reflect.deleteProperty(values, field);
     }
 
     return values;
-  }
-
-  function formatTime(time: string, format: string) {
-    if (format === 'timestamp') {
-      return dateUtil(time).unix();
-    } else if (format === 'timestampStartDay') {
-      return dateUtil(time).startOf('day').unix();
-    }
-    return dateUtil(time).format(format);
   }
 
   function initDefault() {
     const schemas = unref(getSchema);
     const obj: Recordable = {};
     schemas.forEach((item) => {
-      const { defaultValue, defaultValueObj } = item;
-      const fieldKeys = Object.keys(defaultValueObj || {});
-      if (fieldKeys.length) {
-        fieldKeys.map((field) => {
-          obj[field] = defaultValueObj![field];
-          if (formModel[field] === undefined) {
-            formModel[field] = defaultValueObj![field];
-          }
-        });
-      }
-      if (!isNil(defaultValue)) {
+      const { defaultValue } = item;
+      if (!isNullOrUnDef(defaultValue)) {
         obj[item.field] = defaultValue;
 
         if (formModel[item.field] === undefined) {

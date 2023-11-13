@@ -11,10 +11,10 @@ export default defineComponent({
   props: basicProps as any,
   emits: ['cancel'],
   setup(props, { slots, emit }) {
-    const { open, draggable, destroyOnClose } = toRefs(props);
+    const { visible, draggable, destroyOnClose } = toRefs(props);
     const attrs = useAttrs();
     useModalDragMove({
-      open,
+      visible,
       destroyOnClose,
       draggable,
     });

@@ -1,5 +1,5 @@
 <script lang="tsx">
-  import type { CSSProperties, PropType, VNodeChild } from 'vue';
+  import type { CSSProperties, PropType } from 'vue';
   import { defineComponent, computed, unref } from 'vue';
   import { Tooltip } from 'ant-design-vue';
   import { InfoCircleOutlined } from '@ant-design/icons-vue';
@@ -36,9 +36,7 @@
     /**
      * Help text list
      */
-    text: {
-      type: [Array, String, Object] as PropType<string[] | string | VNodeChild | JSX.Element>,
-    },
+    text: { type: [Array, String] as PropType<string[] | string> },
   };
 
   export default defineComponent({
@@ -73,7 +71,7 @@
             );
           });
         }
-        return <div>{textList}</div>;
+        return null;
       }
 
       return () => {

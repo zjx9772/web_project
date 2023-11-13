@@ -17,10 +17,10 @@ const nodeList: FlushList = new Map();
 let startClick: MouseEvent;
 
 if (!isServer) {
-  on(document, 'mousedown', (e: Event) => (startClick = e as MouseEvent));
-  on(document, 'mouseup', (e: Event) => {
+  on(document, 'mousedown', (e: MouseEvent) => (startClick = e));
+  on(document, 'mouseup', (e: MouseEvent) => {
     for (const { documentHandler } of nodeList.values()) {
-      documentHandler(e as MouseEvent, startClick);
+      documentHandler(e, startClick);
     }
   });
 }

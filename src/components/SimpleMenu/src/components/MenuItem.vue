@@ -83,7 +83,7 @@
       }
       watch(
         () => activeName.value,
-        (name: string | number) => {
+        (name: string) => {
           if (name === props.name) {
             const { list, uidList } = getParentList();
             active.value = true;

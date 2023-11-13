@@ -28,9 +28,9 @@ const RippleDirective: Directive & RippleProto = {
     const background = bg || RippleDirective.background;
     const zIndex = RippleDirective.zIndex;
 
-    el.addEventListener(options.event, (event: Event) => {
+    el.addEventListener(options.event, (event: EventType) => {
       rippler({
-        event: event as EventType,
+        event,
         el,
         background,
         zIndex,

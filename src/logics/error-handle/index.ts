@@ -62,15 +62,16 @@ function formatComponentName(vm: any) {
 /**
  * Configure Vue error handling function
  */
-function vueErrorHandler(err: unknown, vm: any, info: string) {
+
+function vueErrorHandler(err: Error, vm: any, info: string) {
   const errorLogStore = useErrorLogStoreWithOut();
   const { name, path } = formatComponentName(vm);
   errorLogStore.addErrorLogInfo({
     type: ErrorTypeEnum.VUE,
     name,
     file: path,
-    message: (err as Error).message,
-    stack: processStackMsg(err as Error),
+    message: err.message,
+    stack: processStackMsg(err),
     detail: info,
     url: window.location.href,
   });

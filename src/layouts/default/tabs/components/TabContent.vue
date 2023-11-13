@@ -2,7 +2,7 @@
   <Dropdown
     :dropMenuList="getDropMenuList"
     :trigger="getTrigger"
-    placement="bottomLeft"
+    placement="bottom"
     overlayClassName="multiple-tabs__dropdown"
     @menu-event="handleMenuEvent"
   >

@@ -29,7 +29,7 @@
   import { propTypes } from '/@/utils/propTypes';
   import { REDIRECT_NAME } from '/@/router/constant';
   import { useRouter } from 'vue-router';
-  import { isFunction, isHttpUrl } from '/@/utils/is';
+  import { isFunction, isUrl } from '/@/utils/is';
   import { openWindow } from '/@/utils';
 
   import { useOpenKeys } from './useOpenKeys';
@@ -129,7 +129,7 @@
       }
 
       async function handleSelect(key: string) {
-        if (isHttpUrl(key)) {
+        if (isUrl(key)) {
           openWindow(key);
           return;
         }

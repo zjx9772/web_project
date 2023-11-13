@@ -13,7 +13,7 @@
 <script lang="ts">
   import { defineComponent, PropType, computed } from 'vue';
 
-  import { Switch, type SwitchProps } from 'ant-design-vue';
+  import { Switch } from 'ant-design-vue';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { baseHandler } from '../handler';
@@ -43,11 +43,9 @@
       const getBindValue = computed(() => {
         return props.def ? { checked: props.def } : {};
       });
-
-      const handleChange: SwitchProps['onChange'] = (val) => {
-        props.event && baseHandler(props.event, val);
-      };
-
+      function handleChange(e: ChangeEvent) {
+        props.event && baseHandler(props.event, e);
+      }
       return {
         prefixCls,
         t,

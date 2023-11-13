@@ -34,14 +34,7 @@
 </template>
 <script lang="ts" setup>
   import { type PropType, computed, ref, watch, useSlots } from 'vue';
-  import {
-    Dropdown,
-    Menu,
-    MenuItem,
-    MenuDivider,
-    InputSearch,
-    type MenuProps,
-  } from 'ant-design-vue';
+  import { Dropdown, Menu, MenuItem, MenuDivider, InputSearch } from 'ant-design-vue';
   import Icon from '@/components/Icon/Icon.vue';
   import { BasicTitle } from '/@/components/Basic';
   import { useI18n } from '/@/hooks/web/useI18n';
@@ -129,7 +122,8 @@
       : defaultToolbarList;
   });
 
-  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+  function handleMenuClick(e: { key: ToolbarEnum }) {
+    const { key } = e;
     switch (key) {
       case ToolbarEnum.SELECT_ALL:
         props.checkAll?.(true);
@@ -150,7 +144,7 @@
         emit('strictly-change', true);
         break;
     }
-  };
+  }
 
   function emitChange(value?: string): void {
     emit('search', value);

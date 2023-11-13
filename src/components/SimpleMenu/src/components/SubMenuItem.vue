@@ -20,10 +20,9 @@
       placement="right"
       :overlayClassName="`${prefixCls}-menu-popover`"
       v-else
-      :open="getIsOpend"
-      @on-open-change="handleVisibleChange"
+      :visible="getIsOpend"
+      @visible-change="handleVisibleChange"
       :overlayStyle="getOverlayStyle"
-      :overlayInnerStyle="{ padding: 0 }"
       :align="{ offset: [0, 0] }"
     >
       <div :class="getSubClass" v-bind="getEvents(false)">
@@ -136,6 +135,7 @@
         return [
           `${prefixCls}-submenu`,
           {
+            [`${prefixCls}-item-active`]: state.active,
             [`${prefixCls}-opened`]: state.opened,
             [`${prefixCls}-submenu-disabled`]: props.disabled,
             [`${prefixCls}-submenu-has-parent-submenu`]: unref(getParentSubMenu),

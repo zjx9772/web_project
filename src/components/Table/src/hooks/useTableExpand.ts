@@ -8,7 +8,7 @@ export function useTableExpand(
   tableData: Ref<Recordable[]>,
   emit: EmitType,
 ) {
-  const expandedRowKeys = ref<(string | number)[]>([]);
+  const expandedRowKeys = ref<string[]>([]);
 
   const getAutoCreateKey = computed(() => {
     return unref(propsRef).autoCreateKey && !unref(propsRef).rowKey;
@@ -37,7 +37,7 @@ export function useTableExpand(
     expandedRowKeys.value = keys;
   }
 
-  function expandRows(keys: (string | number)[]) {
+  function expandRows(keys: string[]) {
     // use row ID expands the specified table row
     const { isTreeTable } = unref(propsRef);
     if (!isTreeTable) return;

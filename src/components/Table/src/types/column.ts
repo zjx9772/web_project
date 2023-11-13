@@ -80,7 +80,7 @@ export interface ColumnProps<T> {
    * Whether filterDropdown is visible
    * @type boolean
    */
-  filterDropdownOpen?: boolean;
+  filterDropdownVisible?: boolean;
 
   /**
    * Whether the dataSource is filtered

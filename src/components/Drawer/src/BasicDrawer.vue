@@ -1,5 +1,5 @@
 <template>
-  <Drawer v-bind="getBindValues" :class="prefixCls" @close="onClose">
+  <Drawer :class="prefixCls" @close="onClose" v-bind="getBindValues">
     <template #title v-if="!$slots.title">
       <DrawerHeader
         :title="getMergeProps.title"
@@ -58,9 +58,9 @@
     components: { Drawer, ScrollContainer, DrawerFooter, DrawerHeader },
     inheritAttrs: false,
     props: basicProps,
-    emits: ['open-change', 'ok', 'close', 'register'],
+    emits: ['visible-change', 'ok', 'close', 'register'],
     setup(props, { emit }) {
-      const openRef = ref(false);
+      const visibleRef = ref(false);
       const attrs = useAttrs();
       const propsRef = ref<Partial<DrawerProps | null>>(null);
 
@@ -69,7 +69,7 @@
 
       const drawerInstance: DrawerInstance = {
         setDrawerProps: setDrawerProps as any,
-        emitOpen: undefined,
+        emitVisible: undefined,
       };
 
       const instance = getCurrentInstance();
@@ -85,7 +85,7 @@
           placement: 'right',
           ...unref(attrs),
           ...unref(getMergeProps),
-          open: unref(openRef),
+          visible: unref(visibleRef),
         };
         opt.title = undefined;
         const { isDetail, width, wrapClassName, getContainer } = opt;
@@ -94,10 +94,11 @@
             opt.width = '100%';
           }
           const detailCls = `${prefixCls}__detail`;
-          opt.rootClassName = wrapClassName ? `${wrapClassName} ${detailCls}` : detailCls;
+          opt.class = wrapClassName ? `${wrapClassName} ${detailCls}` : detailCls;
 
           if (!getContainer) {
-            opt.getContainer = `.${prefixVar}-layout-content`;
+            // TODO type error?
+            opt.getContainer = `.${prefixVar}-layout-content` as any;
           }
         }
         return opt as DrawerProps;
@@ -134,19 +135,19 @@
       });
 
       watch(
-        () => props.open,
+        () => props.visible,
         (newVal, oldVal) => {
-          if (newVal !== oldVal) openRef.value = newVal;
+          if (newVal !== oldVal) visibleRef.value = newVal;
         },
         { deep: true },
       );
 
       watch(
-        () => openRef.value,
-        (open) => {
+        () => visibleRef.value,
+        (visible) => {
           nextTick(() => {
-            emit('open-change', open);
-            instance && drawerInstance.emitOpen?.(open, instance.uid);
+            emit('visible-change', visible);
+            instance && drawerInstance.emitVisible?.(visible, instance.uid);
           });
         },
       );
@@ -157,18 +158,18 @@
         emit('close', e);
         if (closeFunc && isFunction(closeFunc)) {
           const res = await closeFunc();
-          openRef.value = !res;
+          visibleRef.value = !res;
           return;
         }
-        openRef.value = false;
+        visibleRef.value = false;
       }
 
       function setDrawerProps(props: Partial<DrawerProps>): void {
         // Keep the last setDrawerProps
         propsRef.value = deepMerge(unref(propsRef) || ({} as any), props);
 
-        if (Reflect.has(props, 'open')) {
-          openRef.value = !!props.open;
+        if (Reflect.has(props, 'visible')) {
+          visibleRef.value = !!props.visible;
         }
       }
 

@@ -65,7 +65,7 @@
   </a-input>
 </template>
 <script lang="ts" setup>
-  import { ref, watchEffect, watch } from 'vue';
+  import { ref, watchEffect, watch, unref } from 'vue';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { ScrollContainer } from '/@/components/Container';
   import { Input, Popover, Pagination, Empty } from 'ant-design-vue';
@@ -73,11 +73,14 @@
   import SvgIcon from './SvgIcon.vue';
 
   import iconsData from '../data/icons.data';
+  import { propTypes } from '/@/utils/propTypes';
   import { usePagination } from '/@/hooks/web/usePagination';
   import { useDebounceFn } from '@vueuse/core';
   import { useI18n } from '/@/hooks/web/useI18n';
+  import { useCopyToClipboard } from '/@/hooks/web/useCopyToClipboard';
+  import { useMessage } from '/@/hooks/web/useMessage';
   import svgIcons from 'virtual:svg-icons-names';
-  import { copyText } from '/@/utils/copyTextToClipboard';
+
   // 没有使用别名引入，是因为WebStorm当前版本还不能正确识别，会报unused警告
   const AInput = Input;
   const APopover = Popover;
@@ -97,23 +100,15 @@
   }
 
   function getSvgIcons() {
-    return svgIcons.map((icon: string) => icon.replace('icon-', ''));
+    return svgIcons.map((icon) => icon.replace('icon-', ''));
   }
 
-  export interface Props {
-    value?: string;
-    width?: string;
-    pageSize?: number;
-    copy?: boolean;
-    mode?: 'svg' | 'iconify';
-  }
-
-  const props = withDefaults(defineProps<Props>(), {
-    value: '',
-    width: '100%',
-    pageSize: 140,
-    copy: false,
-    mode: 'iconify',
+  const props = defineProps({
+    value: propTypes.string,
+    width: propTypes.string.def('100%'),
+    pageSize: propTypes.number.def(140),
+    copy: propTypes.bool.def(false),
+    mode: propTypes.oneOf<('svg' | 'iconify')[]>(['svg', 'iconify']).def('iconify'),
   });
 
   const emit = defineEmits(['change', 'update:value']);
@@ -129,6 +124,17 @@
   const { prefixCls } = useDesign('icon-picker');
 
   const debounceHandleSearchChange = useDebounceFn(handleSearchChange, 100);
+
+  let clipboardRef;
+  let isSuccessRef;
+
+  if (props.copy) {
+    const clipboard = useCopyToClipboard(props.value);
+    clipboardRef = clipboard?.clipboardRef;
+    isSuccessRef = clipboard?.isSuccessRef;
+  }
+
+  const { createMessage } = useMessage();
 
   const { getPaginationList, getTotal, setCurrentPage } = usePagination(
     currentList,
@@ -154,13 +160,15 @@
   function handleClick(icon: string) {
     currentSelect.value = icon;
     if (props.copy) {
-      copyText(icon, t('component.icon.copy'));
+      clipboardRef.value = icon;
+      if (unref(isSuccessRef)) {
+        createMessage.success(t('component.icon.copy'));
+      }
     }
   }
 
   function handleSearchChange(e: Event) {
-    const value = (e.target as HTMLInputElement).value;
-
+    const value = e.target.value;
     if (!value) {
       setCurrentPage(1);
       currentList.value = icons;

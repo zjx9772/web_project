@@ -21,15 +21,12 @@
       :rowClassName="getRowClassName"
       v-show="getEmptyDataIsShowTable"
       @change="handleTableChange"
-      @resize-column="setColumnWidth"
     >
       <template #[item]="data" v-for="item in Object.keys($slots)" :key="item">
         <slot :name="item" v-bind="data || {}"></slot>
       </template>
       <template #headerCell="{ column }">
-        <slot name="headerCell" v-bind="{ column }">
-          <HeaderCell :column="column" />
-        </slot>
+        <HeaderCell :column="column" />
       </template>
       <!-- 增加对antdv3.x兼容 -->
       <template #bodyCell="data">
@@ -52,7 +49,7 @@
   import { defineComponent, ref, computed, unref, toRaw, inject, watchEffect } from 'vue';
   import { Table } from 'ant-design-vue';
   import { BasicForm, useForm } from '/@/components/Form/index';
-  import { PageWrapperFixedHeightKey } from '/@/enums/pageEnum';
+  import { PageWrapperFixedHeightKey } from '/@/components/Page';
   import HeaderCell from './components/HeaderCell.vue';
   import { InnerHandlers } from './types/table';
 
@@ -77,25 +74,6 @@
   import { isFunction } from '/@/utils/is';
   import { warn } from '/@/utils/log';
 
-  const events = [
-    'fetch-success',
-    'fetch-error',
-    'selection-change',
-    'register',
-    'row-click',
-    'row-dbClick',
-    'row-contextmenu',
-    'row-mouseenter',
-    'row-mouseleave',
-    'edit-end',
-    'edit-cancel',
-    'edit-row-end',
-    'edit-change',
-    'expanded-rows-change',
-    'change',
-    'columns-change',
-  ];
-
   export default defineComponent({
     name: 'BasicTable',
     components: {
@@ -104,7 +82,24 @@
       HeaderCell,
     },
     props: basicProps,
-    emits: events,
+    emits: [
+      'fetch-success',
+      'fetch-error',
+      'selection-change',
+      'register',
+      'row-click',
+      'row-dbClick',
+      'row-contextmenu',
+      'row-mouseenter',
+      'row-mouseleave',
+      'edit-end',
+      'edit-cancel',
+      'edit-row-end',
+      'edit-change',
+      'expanded-rows-change',
+      'change',
+      'columns-change',
+    ],
     setup(props, { attrs, emit, slots, expose }) {
       const tableElRef = ref(null);
       const tableData = ref([]);
@@ -177,20 +172,18 @@
         emit,
       );
 
-      function handleTableChange(pagination: any, filters: any, sorter: any, extra: any) {
-        onTableChange(pagination, filters, sorter);
-        emit('change', pagination, filters, sorter);
+      function handleTableChange(...args) {
+        onTableChange.call(undefined, ...args);
+        emit('change', ...args);
         // 解决通过useTable注册onChange时不起作用的问题
         const { onChange } = unref(getProps);
-        onChange && isFunction(onChange) && onChange(pagination, filters, sorter, extra);
+        onChange && isFunction(onChange) && onChange.call(undefined, ...args);
       }
 
       const {
         getViewColumns,
         getColumns,
         setCacheColumnsByField,
-        setCacheColumns,
-        setColumnWidth,
         setColumns,
         getColumnsRef,
         getCacheColumns,
@@ -330,7 +323,6 @@
         getSize: () => {
           return unref(getBindValues).size as SizeType;
         },
-        setCacheColumns,
       };
       createTableContext({ ...tableAction, wrapRef, getBindValues });
 
@@ -347,7 +339,6 @@
         handleSearchInfoChange,
         getEmptyDataIsShowTable,
         handleTableChange,
-        setColumnWidth,
         getRowClassName,
         wrapRef,
         tableAction,
@@ -379,7 +370,7 @@
 
     &-row__striped {
       td {
-        background-color: @app-content-background !important;
+        background-color: @app-content-background;
       }
     }
 
@@ -433,7 +424,7 @@
       //}
     }
 
-    .ant-table-wrapper .ant-pagination {
+    .ant-pagination {
       margin: 10px 0 0;
     }
 

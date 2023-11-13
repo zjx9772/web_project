@@ -1,4 +1,4 @@
-import type { ModalFuncProps } from 'ant-design-vue/lib/modal/Modal';
+import type { ModalFunc, ModalFuncProps } from 'ant-design-vue/lib/modal/Modal';
 import { Modal, message as Message, notification } from 'ant-design-vue';
 import { InfoCircleFilled, CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons-vue';
 import { NotificationArgsProps, ConfigProps } from 'ant-design-vue/lib/notification';
@@ -24,6 +24,14 @@ export interface ModalOptionsEx extends Omit<ModalFuncProps, 'iconType'> {
 }
 export type ModalOptionsPartial = Partial<ModalOptionsEx> & Pick<ModalOptionsEx, 'content'>;
 
+interface ConfirmOptions {
+  info: ModalFunc;
+  success: ModalFunc;
+  error: ModalFunc;
+  warn: ModalFunc;
+  warning: ModalFunc;
+}
+
 function getIcon(iconType: string) {
   if (iconType === 'warning') {
     return <InfoCircleFilled class="modal-icon-warning" />;
@@ -47,7 +55,7 @@ function renderContent({ content }: Pick<ModalOptionsEx, 'content'>) {
 /**
  * @description: Create confirmation box
  */
-function createConfirm(options: ModalOptionsEx) {
+function createConfirm(options: ModalOptionsEx): ConfirmOptions {
   const iconType = options.iconType || 'warning';
   Reflect.deleteProperty(options, 'iconType');
   const opt: ModalFuncProps = {
@@ -56,7 +64,7 @@ function createConfirm(options: ModalOptionsEx) {
     ...options,
     content: renderContent(options),
   };
-  return Modal.confirm(opt);
+  return Modal.confirm(opt) as unknown as ConfirmOptions;
 }
 
 const getBaseOptions = () => {
@@ -104,7 +112,7 @@ export function useMessage() {
   return {
     createMessage: Message,
     notification: notification as NotifyApi,
-    createConfirm,
+    createConfirm: createConfirm,
     createSuccessModal,
     createErrorModal,
     createInfoModal,

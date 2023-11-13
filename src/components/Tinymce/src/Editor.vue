@@ -246,7 +246,7 @@
         bindHandlers(e, attrs, unref(editorRef));
       }
 
-      function setValue(editor: Record<string, any>, val?: string, prevVal?: string) {
+      function setValue(editor: Record<string, any>, val: string, prevVal?: string) {
         if (
           editor &&
           typeof val === 'string' &&
@@ -263,14 +263,14 @@
 
         watch(
           () => props.modelValue,
-          (val, prevVal) => {
+          (val: string, prevVal: string) => {
             setValue(editor, val, prevVal);
           },
         );
 
         watch(
           () => props.value,
-          (val, prevVal) => {
+          (val: string, prevVal: string) => {
             setValue(editor, val, prevVal);
           },
           {

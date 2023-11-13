@@ -1,5 +1,5 @@
 <template>
-  <div v-if="getShow">
+  <template v-if="getShow">
     <LoginFormTitle class="enter-x" />
     <div class="enter-x min-w-64 min-h-64">
       <QrCode
@@ -12,7 +12,7 @@
         {{ t('sys.login.backSignIn') }}
       </Button>
     </div>
-  </div>
+  </template>
 </template>
 <script lang="ts" setup>
   import { computed, unref } from 'vue';
