@@ -14,8 +14,8 @@
         v-model:value="value"
         placeholder="请输入序列号..."
         enter-button
-        class="lg:w-1/4 md:w-1/3"
         @search="onSearch"
+        style="width: 360px"
       />
       <div class="mt-8">
         <img src="../../../assets/images/main-out/bg.png" alt="" />
@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue';
-  import PageWrapper from '@/components/Page/src/PageWrapper.vue';
+  import { PageWrapper } from '@/components/Page';
 
   const value = ref('');
   function onSearch() {}
