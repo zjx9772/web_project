@@ -9,11 +9,20 @@ import type { AppRouteModule } from '/@/router/types';
 // http:ip:port/main-out
 export const mainOutRoutes: AppRouteModule[] = [
   {
-    path: '/main-out',
-    name: 'MainOut',
-    component: () => import('/@/views/demo/main-out/index.vue'),
+    path: '/main',
+    name: 'MainPage',
+    component: () => import('/@/views/demo/main/index.vue'),
     meta: {
-      title: 'MainOut',
+      title: 'Main',
+      ignoreAuth: true,
+    },
+  },
+  {
+    path: '/search',
+    name: 'SearchPage',
+    component: () => import('/@/views/demo/search/index.vue'),
+    meta: {
+      title: 'Search',
       ignoreAuth: true,
     },
   },

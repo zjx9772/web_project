@@ -7,7 +7,7 @@
     content-class="main-out-page"
   >
     <div class="page-header">
-      <img src="../../../assets/images/main-out/img.png" alt="" />
+      <img src="../../../assets/images/main-out/logo.svg" alt="" />
     </div>
     <div class="page-content">
       <a-input-search
