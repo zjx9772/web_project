@@ -8,17 +8,23 @@
   >
     <div class="page-header">
       <img src="../../../assets/images/main-out/logo.svg" alt="" />
+      <Icon
+        @click="goToSearchPage"
+        :size="20"
+        :icon="'ant-design:unordered-list-outlined'"
+        class="cursor-pointer"
+      />
     </div>
     <div class="page-content">
       <a-input-search
-        v-model:value="value"
+        v-model:value="searchValue"
         placeholder="请输入序列号..."
         enter-button
         @search="onSearch"
         style="width: 360px"
       />
       <div class="mt-8">
-        <img src="../../../assets/images/main-out/bg.png" alt="" />
+        <img :src="imgPath" alt="" />
       </div>
     </div>
   </page-wrapper>
@@ -27,9 +33,25 @@
 <script setup lang="ts">
   import { ref } from 'vue';
   import { PageWrapper } from '@/components/Page';
+  import Icon from '@/components/Icon/Icon.vue';
+  import { router } from '@/router';
+  import { getImageApi } from '@/api/scan';
 
-  const value = ref('');
-  function onSearch() {}
+  import { useGlobSetting } from '@/hooks/setting';
+
+  const globSetting = useGlobSetting();
+
+  const searchValue = ref('');
+  const imgPath = ref('');
+  async function onSearch() {
+    const basicUrl = globSetting.apiUrl;
+    const res = await getImageApi({ SeriainNumber: searchValue.value });
+    imgPath.value = basicUrl + '/' + res.imgPath;
+  }
+
+  function goToSearchPage() {
+    router.push('/search');
+  }
 </script>
 
 <style scoped lang="less">
@@ -41,7 +63,7 @@
     .page-header {
       display: flex;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: space-between;
       width: 100%;
       height: 64px;
       padding: 0 16px;

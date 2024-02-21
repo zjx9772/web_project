@@ -23,10 +23,9 @@ export const columns: BasicColumn[] = [
     title: 'Compare_Result',
     dataIndex: 'CompareResult',
     customRender: ({ record }) => {
-      const status = record.status;
-      const enable = ~~status === 0;
+      const text = record.CompareResult;
+      const enable = text === 'OK';
       const color = enable ? 'green' : 'red';
-      const text = enable ? 'OK' : 'ERROR';
       return h(Tag, { color: color }, () => text);
     },
   },
