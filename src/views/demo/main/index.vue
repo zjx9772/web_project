@@ -7,7 +7,12 @@
     content-class="main-out-page"
   >
     <div class="page-header">
-      <img src="../../../assets/images/main-out/logo.svg" alt="" />
+      <img
+        @click="goHome"
+        class="cursor-pointer hover:bg-[rgba(0,0,0,0.02)]"
+        src="../../../assets/images/main-out/logo.svg"
+        alt=""
+      />
       <Icon
         @click="goToSearchPage"
         :size="20"
@@ -24,7 +29,8 @@
         style="width: 360px"
       />
       <div class="mt-8">
-        <img :src="imgPath" alt="" />
+        <!--        <img :src="imgPath" alt="" />-->
+        <AImage :width="200" :src="imgPath" :fallback="fallback" />
       </div>
     </div>
   </page-wrapper>
@@ -38,6 +44,8 @@
   import { getImageApi } from '@/api/scan';
 
   import { useGlobSetting } from '@/hooks/setting';
+  import { Image as AImage } from 'ant-design-vue';
+  import { fallback } from '@/views/demo/search/data';
 
   const globSetting = useGlobSetting();
 
@@ -47,6 +55,10 @@
     const basicUrl = globSetting.apiUrl;
     const res = await getImageApi({ SeriainNumber: searchValue.value });
     imgPath.value = basicUrl + '/' + res.imgPath;
+  }
+
+  function goHome() {
+    router.push('/main');
   }
 
   function goToSearchPage() {

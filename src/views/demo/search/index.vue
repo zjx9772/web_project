@@ -1,7 +1,12 @@
 <template>
   <PageWrapper dense contentFullHeight fixedHeight contentClass="flex flex-col">
     <div class="page-header">
-      <img src="../../../assets/images/main-out/logo.svg" alt="" />
+      <img
+        @click="goHome"
+        class="cursor-pointer hover:bg-[rgba(0,0,0,0.02)]"
+        src="../../../assets/images/main-out/logo.svg"
+        alt=""
+      />
     </div>
     <BasicTable @register="registerTable" class="w-full" :searchInfo="searchInfo">
       <template #bodyCell="{ column, record }">
@@ -13,18 +18,30 @@
         <a-button type="primary" @click="handleCreate">Excel Export</a-button>
       </template>
     </BasicTable>
+    <AImage
+      :width="200"
+      :style="{ display: 'none' }"
+      :preview="{
+        visible,
+        onVisibleChange: setVisible,
+      }"
+      :src="imagePath"
+      :fallback="fallback"
+    />
   </PageWrapper>
 </template>
 <script lang="ts" setup>
-  import { reactive } from 'vue';
+  import { ref, reactive } from 'vue';
 
   import { BasicTable, useTable } from '@/components/Table';
   import { getImageApi, getScanListApi } from '@/api/scan';
   import { PageWrapper } from '@/components/Page';
 
-  import { columns, searchFormSchema } from './data';
+  import { columns, searchFormSchema, fallback } from './data';
   import { useGlobSetting } from '@/hooks/setting';
   import { jsonToSheetXlsx } from '@/components/Excel';
+  import { router } from '@/router';
+  import { Image as AImage } from 'ant-design-vue';
 
   const globSetting = useGlobSetting();
 
@@ -54,6 +71,12 @@
     },
   });
 
+  const visible = ref<boolean>(false);
+  const imagePath = ref<string>('');
+  const setVisible = (value) => {
+    visible.value = value;
+  };
+
   async function handleCreate() {
     const form = getForm();
     const values = form.getFieldsValue();
@@ -76,9 +99,19 @@
   }
 
   async function openImage(record) {
+    imagePath.value = fallback;
+    setVisible(true);
     const basicUrl = globSetting.apiUrl;
     const res = await getImageApi({ SeriainNumber: record.SerialNum });
-    window.open(basicUrl + '/' + res.imgPath);
+    imagePath.value = basicUrl + '/' + res.imgPath;
+    // setTimeout(() => {
+    //   imagePath.value =
+    //     'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png';
+    // }, 2000);
+  }
+
+  function goHome() {
+    router.push('/main');
   }
 </script>
 <style scoped lang="less">
