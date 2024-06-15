@@ -7,7 +7,7 @@ enum Api {
 }
 
 // 分页列表
-export const getScanListApi = (params: any) => defHttp.get<any>({ url: Api.ScanList, params });
+export const getScanListApi = (params: any) => defHttp.post<any>({ url: Api.ScanList, params });
 
 // 获取图片
-export const getImageApi = (params: any) => defHttp.get<any>({ url: Api.GetImage, params });
+export const getImageApi = (params: any) => defHttp.post<any>({ url: Api.GetImage, params });
