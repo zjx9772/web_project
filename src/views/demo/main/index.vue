@@ -43,18 +43,19 @@
   import { router } from '@/router';
   import { getImageApi } from '@/api/scan';
 
-  import { useGlobSetting } from '@/hooks/setting';
+  // import { useGlobSetting } from '@/hooks/setting';
   import { Image as AImage } from 'ant-design-vue';
   import { fallback } from '@/views/demo/search/data';
 
-  const globSetting = useGlobSetting();
+  // const globSetting = useGlobSetting();
 
   const searchValue = ref('');
   const imgPath = ref('');
   async function onSearch() {
-    const basicUrl = globSetting.apiUrl;
+    // const basicUrl = globSetting.apiUrl;
     const res = await getImageApi({ SeriainNumber: searchValue.value });
-    imgPath.value = basicUrl + '/' + res.imgPath;
+    imgPath.value = res.Base64;
+    // imgPath.value = basicUrl + '/' + res.imgPath;
   }
 
   function goHome() {

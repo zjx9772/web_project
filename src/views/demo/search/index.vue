@@ -38,12 +38,12 @@
   import { PageWrapper } from '@/components/Page';
 
   import { columns, searchFormSchema, fallback } from './data';
-  import { useGlobSetting } from '@/hooks/setting';
+  // import { useGlobSetting } from '@/hooks/setting';
   import { jsonToSheetXlsx } from '@/components/Excel';
   import { router } from '@/router';
   import { Image as AImage } from 'ant-design-vue';
 
-  const globSetting = useGlobSetting();
+  // const globSetting = useGlobSetting();
 
   const searchInfo = reactive<Recordable>({});
   const [registerTable, { getForm }] = useTable({
@@ -101,9 +101,10 @@
   async function openImage(record) {
     imagePath.value = fallback;
     setVisible(true);
-    const basicUrl = globSetting.apiUrl;
+    // const basicUrl = globSetting.apiUrl;
     const res = await getImageApi({ SeriainNumber: record.SerialNum });
-    imagePath.value = basicUrl + '/' + res.imgPath;
+    imagePath.value = res.Base64;
+    // imagePath.value = basicUrl + '/' + res.imgPath;
     // setTimeout(() => {
     //   imagePath.value =
     //     'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png';
